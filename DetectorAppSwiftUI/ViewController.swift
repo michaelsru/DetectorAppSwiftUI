@@ -65,16 +65,16 @@ class ViewController: UIViewController, AVCaptureVideoDataOutputSampleBufferDele
             // Permission has been granted before
             case .authorized:
                 permissionGranted = true
-                
+
             // Permission has not been requested yet
             case .notDetermined:
                 requestPermission()
-                    
+
             default:
                 permissionGranted = false
             }
     }
-    
+
     func requestPermission() {
         sessionQueue.suspend()
         AVCaptureDevice.requestAccess(for: .video) { [unowned self] granted in
@@ -85,8 +85,15 @@ class ViewController: UIViewController, AVCaptureVideoDataOutputSampleBufferDele
     
     func setupCaptureSession() {
         // Camera input
-        guard let videoDevice = AVCaptureDevice.default(.builtInDualWideCamera,for: .video, position: .back) else { return }
-        guard let videoDeviceInput = try? AVCaptureDeviceInput(device: videoDevice) else { return }
+        guard let videoDevice = AVCaptureDevice.DiscoverySession(deviceTypes: [.builtInWideAngleCamera], mediaType: .video, position: .back).devices.first else {
+//        guard let videoDevice = AVCaptureDevice.default(for: .video) else {
+            print("Can not get AVCaptureDevice")
+            return
+        }
+        guard let videoDeviceInput = try? AVCaptureDeviceInput(device: videoDevice) else {
+            print("Can not get AVCaptureDeviceInput")
+            return
+        }
            
         guard captureSession.canAddInput(videoDeviceInput) else { return }
         captureSession.addInput(videoDeviceInput)

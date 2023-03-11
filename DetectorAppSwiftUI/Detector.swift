@@ -32,6 +32,7 @@ extension ViewController {
             
             // Transformations
             let objectBounds = VNImageRectForNormalizedRect(objectObservation.boundingBox, Int(screenRect.size.width), Int(screenRect.size.height))
+            print("id:\(objectObservation.labels[0].identifier) confidence:\(objectObservation.confidence) (\(round(objectBounds.minX)), \(round(objectBounds.minY))), (\(round(objectBounds.maxX)), \(round(objectBounds.maxY)))")
             let transformedBounds = CGRect(x: objectBounds.minX, y: screenRect.size.height - objectBounds.maxY, width: objectBounds.maxX - objectBounds.minX, height: objectBounds.maxY - objectBounds.minY)
             
             let boxLayer = self.drawBoundingBox(transformedBounds)
@@ -43,7 +44,9 @@ extension ViewController {
     func setupLayers() {
         detectionLayer = CALayer()
         detectionLayer.frame = CGRect(x: 0, y: 0, width: screenRect.size.width, height: screenRect.size.height)
-        self.view.layer.addSublayer(detectionLayer)
+        DispatchQueue.main.async { [weak self] in
+            self!.view.layer.addSublayer(self!.detectionLayer)
+        }
     }
     
     func updateLayers() {
